@@ -1,8 +1,10 @@
 /* Dice roller javascript - Originally for Nightbot
 
-This script will take a text string "XdY", and roll a dice of size Y, X times
+This script will take a text string "XdY", and roll a dice of size Y, X times.
 
 Modifiers can be added "XdY+Z", or "XdY-Z" and single dice rolled as "dY"
+
+Fudge dice can also be rolled using "4df"
 
 Source originally unknown, modified by DJNrrd
 */
@@ -25,8 +27,16 @@ function roll(roll_txt) {
     // Assign the lower value between the input and 1000
     times_to_roll = Math.min(times_to_roll, 1000);
   }
-  // Turn the second value in "cmd_parts" to a decimal Integer
-  size_of_dice = Number.parseInt(cmd_parts[1], 10);
+  // If the second value in "cmd_parts" is "f" then we are using Fudge dice, otherwise convert to a decimal Integer
+  var size_of_dice = cmd_parts[1];
+  var fudge = false;
+  if(size_of_dice == "f") {
+    size_of_dice = 3;
+    fudge =true;
+  }
+  else{
+    size_of_dice = Number.parseInt(size_of_dice, 10);
+  }
   // Default modifier of 0
   var modifier = 0;
   // Are there more than 2 parts to the original command?
@@ -54,6 +64,10 @@ function roll(roll_txt) {
     dice_roll = dice_roll + 1;
     // Round the number DOWN to the nearest integer
     dice_roll = Math.floor(dice_roll);
+    // If we are using fudge dice, conver the values
+    if(fudge == true) {
+        dice_roll = -2 + dice_roll
+    }
     // Add the value of the roll to the total result. Append the array of rolls with the result
     total_value = total_value + dice_roll;
     dice_rolls.push(dice_roll);
